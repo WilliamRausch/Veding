@@ -26,14 +26,14 @@ Model.Item.create({
   res.status(400).send("item not made")
 })
 });
-router.post('/api/customer/items/:itemId/purchases', function(req, res){
+router.post('/api/vendor/items/:itemId/purchases', function(req, res){
 
 let item;
 
   Model.Item.findById(req.params.itemId)
 .then(function(data){
   item = data;
-  if((req.body.paid >= data.price) && (data.quantity != 0) ){
+  if((req.body.payment >= data.price) && (data.quantity != 0) ){
     Model.Purchase.create({
       payment: req.body.payment,
       itemId: req.params.itemId
@@ -62,11 +62,12 @@ let item;
 router.get('/api/vendor/purchases', function(req, res){
 
   Model.Purchase.findAll({
-    include: [{model: Model.Item, as: 'Items'}]
+    // include: [{model: Model.Item, as: 'Items'}]
   })
   .then(function(data){
     res.json({display: data})
   }).catch(function(err){
+  	console.log("ERROR")
     console.log(err);
   })
 
@@ -74,7 +75,7 @@ router.get('/api/vendor/purchases', function(req, res){
 router.get('/api/vendor/money', function(req, res){
   Model.Purchase.findAll({
   }).then(function(data){
-    Model.Purchase.sum('amountPaid')
+    Model.Purchase.sum('payment')
     .then(function(data){
       res.json(data)
     })
